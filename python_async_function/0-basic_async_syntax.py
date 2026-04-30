@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
-"""
-Module providing an element_length function.
-"""
-from typing import Iterable, Sequence, List, Tuple, Any
-
-
-def element_length(lst: Iterable[Sequence[Any]]) -> List[Tuple[Sequence[Any], int]]:
-    """
-    Takes an iterable of sequences and returns a list of tuples,
-    where each tuple contains the sequence and its length.
-    """
-    return [(i, len(i)) for i in lst]
+"""This module provides an async function that waits for a random delay."""
+import asyncio
+import random
+async def wait_random(max_delay: int = 10) -> float:
+    """Wait for a random delay between 0 and max_delay and return it."""
+    delay = random.uniform(0, max_delay)
+    await asyncio.sleep(delay)
+    return delay
