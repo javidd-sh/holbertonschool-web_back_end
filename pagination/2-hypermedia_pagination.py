@@ -39,17 +39,12 @@ class Server:
         """
         Get page from dataset based on pagination parameters.
         """
-        # Verify arguments are integers strictly greater than 0
-        assert type(page) is int and page > 0
-        assert type(page_size) is int and page_size > 0
+        assert isinstance(page, int) and page > 0
+        assert isinstance(page_size, int) and page_size > 0
 
-        # Find the correct start and end indices
         start, end = index_range(page, page_size)
-
-        # Get the dataset
         data = self.dataset()
 
-        # If indices are out of range for the dataset size, return empty list
         if start >= len(data):
             return []
 
@@ -59,14 +54,10 @@ class Server:
         """
         Get hypermedia metadata dictionary along with the paginated dataset.
         """
-        # Fetch the records for this page
         data = self.get_page(page, page_size)
-        
-        # Determine total dataset length to compute total pages
         total_records = len(self.dataset())
         total_pages = math.ceil(total_records / page_size)
 
-        # Calculate previous and next pages
         next_page = page + 1 if page < total_pages else None
         prev_page = page - 1 if page > 1 else None
 
