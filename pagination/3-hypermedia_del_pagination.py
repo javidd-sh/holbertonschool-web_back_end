@@ -43,7 +43,7 @@ class Server:
         Retrieves a dict containing hypermedia details indexed from a start point,
         resilient to deletions in the dataset.
         """
-        # Get both datasets
+        # Ensure dataset is loaded
         dataset_list = self.dataset()
         indexed_data = self.indexed_dataset()
 
@@ -51,25 +51,25 @@ class Server:
         if index is None:
             index = 0
 
-        # Assert index is in valid range of the ORIGINAL dataset list
+        # Assert index is within valid range of the dataset
         assert isinstance(index, int) and 0 <= index < len(dataset_list)
         assert isinstance(page_size, int) and page_size > 0
 
         data = []
         current_index = index
 
-        # Collect data points using the original dataset bounds
+        # Collect data points up to the requested page size
         while len(data) < page_size and current_index < len(dataset_list):
             if current_index in indexed_data:
                 data.append(indexed_data[current_index])
             current_index += 1
 
-        # Determine if there's a next index based on original dataset boundaries
+        # The next index to query is the index after the last item collected
         next_index = current_index if current_index < len(dataset_list) else None
 
         return {
             "index": index,
             "next_index": next_index,
-            "page_size": len(data),
+            "page_size": page_size,  # MUST be the requested page_size parameter
             "data": data
         }
