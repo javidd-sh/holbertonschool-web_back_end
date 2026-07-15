@@ -2,9 +2,10 @@
 """
 Deletion-resilient hypermedia pagination
 """
+
 import csv
 import math
-from typing import List, Dict, Any
+from typing import List, Dict
 
 
 class Server:
@@ -39,37 +40,27 @@ class Server:
         return self.__indexed_dataset
 
     def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
+        """Returning dict
         """
-        Retrieves a dict containing hypermedia details indexed from a start point,
-        resilient to deletions in the dataset.
-        """
-        # Ensure dataset is loaded
-        dataset_list = self.dataset()
-        indexed_data = self.indexed_dataset()
+        dataset_len = len(self.dataset())
+        assert 0 <= index < dataset_len
 
-        # Handle default index value
-        if index is None:
-            index = 0
+        indexed_dataset = self.indexed_dataset()
+        page_dict = {}
 
-        # Assert index is within valid range of the dataset
-        assert isinstance(index, int) and 0 <= index < len(dataset_list)
-        assert isinstance(page_size, int) and page_size > 0
+        i = index
+        while (len(page_dict) < page_size and i < dataset_len):
+            if i in indexed_dataset:
+                page_dict[i] = indexed_dataset[i]
+            i += 1
 
-        data = []
-        current_index = index
-
-        # Collect data points up to the requested page size
-        while len(data) < page_size and current_index < len(dataset_list):
-            if current_index in indexed_data:
-                data.append(indexed_data[current_index])
-            current_index += 1
-
-        # The next index to query is the index after the last item collected
-        next_index = current_index if current_index < len(dataset_list) else None
+        page = list(page_dict.values())
+        vals = len(page)
+        keys = page_dict.keys()
 
         return {
-            "index": index,
-            "next_index": next_index,
-            "page_size": page_size,  # MUST be the requested page_size parameter
-            "data": data
+                'index': index,
+                'next_index': max(keys) + 1,
+                'page_size': vals,
+                'data': page
         }
